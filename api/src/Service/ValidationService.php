@@ -269,12 +269,9 @@ class ValidationService
 
 
         // We willen de post wel opschonnen, met andere woorden alleen die dingen posten die niet als in een atrubte zijn gevangen
-
-
         $component = $this->gatewayService->gatewayToArray($objectEntity->getEntity()->getGateway());
         $query = [];
         $headers = [];
-
 
         if($objectEntity->getUri()){
             $method = 'PUT';
@@ -312,6 +309,9 @@ class ValidationService
                 $post[$value->getAttribute()->getName()] = $value->getObjects()->first()->getUri();
             }
         }
+        if(!empty($objectEntity->getEntity()->getUsedProperties())) {
+            $this->filterArrayByUsedProperties($post, $objectEntity->getEntity()->getUsedProperties());
+        }
 
         $promise = $this->commonGroundService->callService($component, $url, json_encode($post), $query, $headers, true, $method)->then(
             // $onFulfilled
@@ -341,6 +341,15 @@ class ValidationService
                 $item->set($result);
                 //$item->expiresAt(new \DateTime('tomorrow'));
                 $this->cache->save($item);
+
+                //lets filter the response
+                if (isset($result['hydra:member'])) {
+                    foreach($result['hydra:member'] as &$item) {
+                        $item = $this->filterArrayByUsedProperties($item, $objectEntity->getEntity()->getUsedProperties());
+                    }
+                } else {
+                    $result = $this->filterArrayByUsedProperties($result, $objectEntity->getEntity()->getUsedProperties());
+                }
             },
             // $onRejected
             function ($error) use ($post, $objectEntity ) {
@@ -374,6 +383,15 @@ class ValidationService
         );
 
         return $promise;
+    }
+
+    public function filterArrayByUsedProperties(array $data, array $usedProperties): array
+    {
+        return array_filter(
+            $data,
+            fn ($key) => in_array($key, $usedProperties),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 
     //TODO: change this to work better? (known to cause problems) used it to generate the @id / @eav for eav objects (intern and extern objects).

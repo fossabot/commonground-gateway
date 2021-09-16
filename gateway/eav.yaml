@@ -117,6 +117,9 @@ App\Entity\Entity:
         description: apikey
         gateway: '@contacten_api'
         endpoint: 'people'
+        usedProperties:
+            - name
+            - description
     permissionDetails:
         name: permissionDetails
         description: the permissions that this person has given

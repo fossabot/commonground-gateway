@@ -142,6 +142,19 @@ class Entity
     private ?array $transformations = [];
 
     /**
+     * @Groups({"read", "write"})
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private ?array $usedProperties = [];
+
+
+    /**
+     * @Groups({"read", "write"})
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private ?array $availableProperties = [];
+
+    /**
      * @var Datetime The moment this request was created
      *
      * @Groups({"read"})
@@ -348,6 +361,30 @@ class Entity
     public function setTransformations(array $transformations): self
     {
         $this->transformations = $transformations;
+
+        return $this;
+    }
+
+    public function getUsedProperties(): ? array
+    {
+        return $this->usedProperties;
+    }
+
+    public function setUsedProperties(array $usedProperties): self
+    {
+        $this->usedProperties = $usedProperties;
+
+        return $this;
+    }
+
+    public function getAvailableProperties(): ? array
+    {
+        return $this->availableProperties;
+    }
+
+    public function setAvailableProperties(array $availableProperties): self
+    {
+        $this->availableProperties = $availableProperties;
 
         return $this;
     }
