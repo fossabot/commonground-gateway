@@ -20,9 +20,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 /**
- * An entity that functions a an object template for objects that might be stored in the EAV database
+ * An entity that functions a an object template for objects that might be stored in the EAV database.
  *
  * @ApiResource(
  *  normalizationContext={"groups"={"read"}, "enable_max_depth"=true},
@@ -105,7 +104,7 @@ class Entity
     private $description;
 
     /**
-     * wheter or not the properties of the original object are automaticly include
+     * wheter or not the properties of the original object are automaticly include.
      *
      * @ORM\Column(type="boolean", nullable=true)
      */
@@ -163,6 +162,22 @@ class Entity
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private ?string $route = null;
+
+    /**
+     * @var array|null The properties available for this entity (for all CRUD calls) if null all properties will be used. This affects which properties are written to / retrieved from external api's.
+     *
+     * @Groups({"read", "write"})
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private ?array $availableProperties;
+
+    /**
+     * @var array|null The properties used for this entity (for all CRUD calls) if null all properties will be used. This affects which properties will be written / shown.
+     *
+     * @Groups({"read", "write"})
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private ?array $usedProperties;
 
     /**
      * @ORM\OneToMany(targetEntity=GatewayResponceLog::class, mappedBy="entity", fetch="EXTRA_LAZY")
@@ -235,13 +250,12 @@ class Entity
         return $this;
     }
 
-
     /**
-     * Get an value based on a attribut
+     * Get an value based on a attribut.
      *
-     * @param  string $name the name of the attribute that you are searching for
-     * @return Attribute|Boolean Iether the found attribute or false if no attribute could be found
+     * @param string $name the name of the attribute that you are searching for
      *
+     * @return Attribute|bool Iether the found attribute or false if no attribute could be found
      */
     public function getAttributeByName(string $name)
     {
@@ -249,13 +263,12 @@ class Entity
         $criteria = Criteria::create()->andWhere(Criteria::expr()->eq('name', $name))->setMaxResults(1);
         $attributes = $this->getAttributes()->matching($criteria);
 
-        if($attributes->isEmpty()){
+        if ($attributes->isEmpty()) {
             return false;
         }
 
         return $attributes->first();
     }
-
 
     /**
      * @return Collection|Attribute[]
@@ -347,7 +360,7 @@ class Entity
         return $this;
     }
 
-    public function getTransformations(): ? array
+    public function getTransformations(): ?array
     {
         return $this->transformations;
     }
@@ -391,6 +404,30 @@ class Entity
     public function setRoute(?string $route): self
     {
         $this->route = $route;
+
+        return $this;
+    }
+
+    public function getAvailableProperties(): ?array
+    {
+        return $this->availableProperties;
+    }
+
+    public function setAvailableProperties(?array $availableProperties): self
+    {
+        $this->availableProperties = $availableProperties;
+
+        return $this;
+    }
+
+    public function getUsedProperties(): ?array
+    {
+        return $this->usedProperties;
+    }
+
+    public function setUsedProperties(?array $usedProperties): self
+    {
+        $this->usedProperties = $usedProperties;
 
         return $this;
     }
