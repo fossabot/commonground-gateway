@@ -1,0 +1,62 @@
+App\Entity\Authentication:
+    authentication_1:
+        authenticateUrl: https://login.microsoftonline.com/common/oauth2/v2.0/authorize
+        clientId: 85ef6bac-98b4-47fb-ae68-f248b91f6dde
+        name: conduction
+        scopes:
+            - openid
+            - profile
+        secret: 2_sIrT0BXCv..v_nP~UX_tF012RifW5a80
+        tokenUrl: https://login.microsoftonline.com/common/oauth2/v2.0/token
+App\Entity\Document:
+    verzoek:
+        documentCreationService: http://document-creation-service.verhuizen.svc.cluster.local/templates/cec5a352-9a83-4e45-b198-8796d801ee48
+        documentType: pdf
+        entity: '@request'
+        name: verzoek pdf
+        route: verzoek_pdf
+App\Entity\Entity:
+    request:
+        availableProperties:
+            - properties
+        description: Dit endpoint behandeld alle functionaliteit rondom verzoeken.
+        endpoint: requests
+        extend: false
+        gateway: '@gateway_12'
+        name: requests
+        route: /api/requests
+App\Entity\Gateway:
+    gateway_1:
+        apikey: 9cd27d6d-dd11-4586-acbe-0d635b4f2807
+        auth: apikey
+        documentation: https://raw.githubusercontent.com/ConductionNL/productenendienstencatalogus/master/api/public/schema/openapi.yaml
+        location: http://procestypecatalogus.verhuizen.svc.cluster.local
+        name: pdc
+    gateway_2:
+        accept: application/hal+json
+        apikey: 45c1a4b6-59d3-4a6e-86bf-88a872f35845
+        auth: apikey
+        documentation: https://raw.githubusercontent.com/ConductionNL/brpservice/master/api/public/schema/openapi.yaml
+        locale: null
+        location: https://servicegateway.accp.s-hertogenbosch.nl
+        name: brp
+        password: demodam
+        username: begraven
+    gateway_11:
+        apikey: 71b8c749-07ea-4ab7-bc83-49c5d4961441
+        auth: apikey
+        documentation: https://raw.githubusercontent.com/ConductionNL/productenendienstencatalogus/master/api/public/schema/openapi.yaml
+        location: http://adresservice.verhuizen.svc.cluster.local
+        name: as
+    gateway_12:
+        apikey: ac6f1ff9-5de8-4870-8fe9-65b8ee254a3e
+        auth: apikey
+        documentation: https://raw.githubusercontent.com/ConductionNL/productenendienstencatalogus/master/api/public/schema/openapi.yaml
+        location: http://verzoekregistratiecomponent.verhuizen.svc.cluster.local
+        name: vrc
+    gateway_13:
+        apikey: 82b62831-d360-4beb-924e-a1e71826ac19
+        auth: apikey
+        documentation: https://raw.githubusercontent.com/ConductionNL/logicservice/master/api/public/schema/openapi.yaml
+        location: http://logicservice.verhuizen.svc.cluster.local
+        name: logic
