@@ -20,8 +20,17 @@ class GatewayService
     private TokenStorageInterface $tokenStorage;
     private AuthenticationService $authenticationService;
     private RequestStack $requestStack;
+    private NLXService $NLXService;
 
-    public function __construct(CommonGroundService $commonGroundService, EntityManagerInterface $entityManager, TokenStorageInterface $tokenStorage, AuthenticationService $authenticationService, RequestStack $requestStack)
+    public function __construct
+    (
+        CommonGroundService $commonGroundService,
+        EntityManagerInterface $entityManager,
+        TokenStorageInterface $tokenStorage,
+        AuthenticationService $authenticationService,
+        RequestStack $requestStack,
+        NLXService $NLXService
+    )
     {
         $this->commonGroundService = $commonGroundService;
         $this->entityManager = $entityManager;
@@ -48,7 +57,7 @@ class GatewayService
         $this->checkGateway($gateway);
         $component = $this->gatewayToArray($gateway);
         $url = $gateway->getLocation().'/'.$endpoint;
-
+        $headers = $this->NLXService->createNLXHeaders($url, $query, $headers);
         $result = $this->commonGroundService->callService($component, $url, $content, $query, ['accept' => $headers['accept'][0]], false, $method);
 
         if (is_array($result)) {
