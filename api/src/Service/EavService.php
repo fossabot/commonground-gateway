@@ -258,6 +258,9 @@ class EavService
         // Let intervene if it is  a known file extension
         $supportedExtensions = ['json', 'jsonld', 'jsonhal', 'xml', 'csv', 'yaml'];
         if ($entity && in_array($requestBase['extension'], $supportedExtensions)) {
+            // we need to overwrite te responce to a simple file responce
+            $response = new Response($result);
+            // And add the file
             $date = new \DateTime();
             $date = $date->format('Ymd_His');
             $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, "{$entity->getName()}_{$date}.{$requestBase['extension']}");
