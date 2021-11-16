@@ -1,0 +1,157 @@
+
+App\Entity\Entity:
+    # Grafregistratie Component => https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/ConductionNL/grafregistratiecomponent/master/api/public/schema/openapi.yaml#operation/postGraveCoverCollection
+    graveCover:
+        name: GraveCover
+        endpoint: 'grave-covers'
+
+    cemetery:
+        name: Cemetery
+        endpoint: 'cemeteries'
+    grave:
+        name: Grave
+        endpoint: 'graves'
+
+    stakeholder:
+        name: Stakeholder
+        endpoint: 'stakeholders'
+
+
+App\Entity\Attribute:
+    # Cemetery
+    cemetery_reference:
+        name: reference
+        type: string
+        maxLength: 255
+        entity: '@cemetery'        
+    cemetery_location:
+        name: location
+        type: string
+        maxLength: 255
+        entity: '@cemetery'
+    cemetery_organization:
+        name: organization
+        type: string
+        maxLength: 255
+        entity: '@cemetery'
+    cemetery_calendar:
+        name: calendar
+        type: string
+        maxLength: 255
+        entity: '@cemetery'
+    cemetery_graves:
+        name: graves
+        type: object
+        multiple: true
+        entity: '@cemetery'
+        object: '@grave'
+        inversedBy: '@grave_cemetery'
+    cemetery_graveTypes:
+        name: graveTypes
+        type: string
+        maxLength: 255
+        entity: '@cemetery'
+    cemetery_configuration:
+        name: configuration
+        type: string
+        maxLength: 255
+        entity: '@cemetery'
+        
+    # Grave
+    grave_description:
+        name: description
+        type: string
+        maxLength: 255
+        entity: '@grave'
+    grave_acquisition:
+        name: acquisition
+        type: string
+        maxLength: 255
+        entity: '@grave'
+    grave_reference:
+        name: reference
+        type: string
+        maxLength: 255
+        entity: '@grave'
+    grave_status:
+        name: status
+        type: string
+        maxLength: 255
+        entity: '@grave'
+    grave_location:
+        name: location
+        type: string
+        maxLength: 255
+        entity: '@grave'
+    grave_position:
+        name: position
+        type: string
+        maxLength: 255
+        entity: '@grave'
+    grave_graveCovers:
+        name: grave_covers
+        type: object
+        multiple: true
+        entity: '@grave'
+        object: '@graveCover'
+        inversedBy: '@graveCover_graves'
+    grave_deceased:
+        name: deceased
+        type: string
+        maxLength: 255
+        entity: '@grave'
+    grave_stakeholder:
+        name: stakeholder
+        type: object
+        entity: '@grave'
+        object: '@stakeholder'
+        inversedBy: '@stakeholder_graves'
+    grave_cemetery:
+        name: cemetery
+        type: object
+        entity: '@grave'
+        object: '@cemetery'
+        inversedBy: '@cemetery_graves'
+    grave_graveType:
+        name: graveType
+        type: string
+        maxLength: 255
+        entity: '@grave'
+
+    # stakeholder
+    stakeholder_contact:
+        name: contact
+        type: string
+        maxLength: 255
+        entity: '@stakeholder'
+    stakeholder_ingeschrevenpersoon:
+        name: ingeschrevenpersoon
+        type: string
+        maxLength: 255
+        entity: '@stakeholder'
+    stakeholder_graves:
+        name: graves
+        type: object
+        multiple: true
+        entity: '@stakeholder'
+        object: '@grave'
+        inversedBy: '@grave_stakeholder'
+
+    # graveCover
+    graveCover_reference:
+        name: reference
+        type: string
+        maxLength: 255
+        entity: '@graveCover'
+    graveCover_description:
+        name: description
+        type: string
+        maxLength: 255
+        entity: '@graveCover'
+    graveCover_graves:
+        name: graves
+        type: object
+        multiple: true
+        entity: '@graveCover'
+        object: '@grave'
+        inversedBy: '@grave_graveCovers'
