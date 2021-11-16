@@ -16,7 +16,6 @@ App\Entity\Entity:
         name: Stakeholder
         endpoint: 'stakeholders'
 
-
 App\Entity\Attribute:
     # Cemetery
     cemetery_reference:

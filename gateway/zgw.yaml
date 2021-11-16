@@ -1,0 +1,448 @@
+App\Entity\Entity:
+    
+    # Zaken
+    resultaat:
+        name: resultaat
+        endpoint: 'resultaten'
+
+    rol:
+        name: rollen
+        endpoint: 'rollen'
+
+    status:
+        name: statussen
+        endpoint: 'statussen'
+
+    zaakcontactmomen:
+        name: zaakcontactmomenten
+        endpoint: 'zaakcontactmomenten'
+
+    zaakinformatieobjectn:
+        name: zaakinformatieobjecten
+        endpoint: 'zaakinformatieobjecten'
+
+    zaakobject:
+        name: zaakobjecten
+        endpoint: 'zaakobjecten'
+
+    zaakverzoek:
+        name: zaakverzoek
+        endpoint: 'zaakverzoeken'
+
+    zaak:
+        name: zaak
+        endpoint: 'zaken'
+        
+    relevanteZaak:
+        name: relevanteZaak
+        endpoint: 'zaken'
+        
+    verlenging:
+        name: verlenging
+        
+    opschorting:
+        name: opschorting          
+
+    # Catalogi 
+    besluittypen:
+        name: besluittypen
+        endpoint: 'besluittypen'
+
+    catalogussen:
+        name: catalogussen
+        endpoint: 'catalogussen'
+
+    eigenschappen:
+        name: eigenschappen
+        endpoint: 'eigenschappen'
+
+    informatieobjecttypen:
+        name: informatieobjecttypen
+        endpoint: 'informatieobjecttypen'
+
+    resultaattypen:
+        name: resultaattypen
+        endpoint: 'resultaattypen'
+
+    roltypen:
+        name: roltypen
+        endpoint: 'roltypen'
+
+    statustypen:
+        name: statustypen
+        endpoint: 'statustypen'
+
+    zaaktype-informatieobjecttypen:
+        name: zaaktype-informatieobjecttypen
+        endpoint: 'zaaktype-informatieobjecttypen'
+
+    zaaktypen:
+        name: zaaktypen
+        endpoint: 'zaaktypen'
+        
+    # Documenten => https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/VNG-Realisatie/gemma-documentregistratiecomponent/master/src/openapi.yaml
+
+    enkelvoudiginformatieobjecten:
+        name: enkelvoudiginformatieobjecten
+        endpoint: 'enkelvoudiginformatieobjecten'
+
+    gebruiksrechten:
+        name: gebruiksrechten
+        endpoint: 'gebruiksrechten'
+
+    objectinformatieobjecten:
+        name: objectinformatieobjecten
+        endpoint: 'objectinformatieobjecten'
+
+    # Klanten => https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/VNG-Realisatie/klanten-api/master/src/openapi.yaml#tag/klanten
+    klanten:
+        name: klanten
+        endpoint: 'klanten'
+        
+    # Contactmomenten API (1.0.0) => https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/VNG-Realisatie/contactmomenten-api/master/src/openapi.yaml
+    contactmomenten:
+        name: contactmomenten
+        endpoint: 'contactmomenten'
+
+    klantcontactmomenten:
+        name: klantcontactmomenten
+        endpoint: 'klantcontactmomenten'
+
+    objectcontactmomenten:
+        name: objectcontactmomenten
+        endpoint: 'objectcontactmomenten'
+
+    # Verzoeken => https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/VNG-Realisatie/verzoeken-api/master/src/openapi.yaml
+    klantverzoeken:
+        name: klantverzoeken
+        endpoint: 'klantverzoeken'
+        
+    objectverzoeken:
+        name: objectverzoeken
+        endpoint: 'objectverzoeken'
+
+    verzoekcontactmomenten:
+        name: verzoekcontactmomenten
+        endpoint: 'verzoekcontactmomenten'
+
+    verzoeken:
+        name: verzoeken
+        endpoint: 'verzoeken'
+
+    verzoekinformatieobjecten:
+        name: verzoekinformatieobjecten
+        endpoint: 'verzoekinformatieobjecten'
+
+    verzoekproducten:
+        name: verzoekproducten
+        endpoint: 'verzoekproducten'
+        
+    # Besluiten => https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/VNG-Realisatie/besluiten-api/master/src/openapi.yaml#operation/objectinformatieobject_read
+    besluiten:
+        name: besluiten
+        endpoint: 'besluiten'
+        
+    besluitinformatieobjecten:
+        name: besluitinformatieobjecten
+        endpoint: 'besluitinformatieobjecten'
+
+App\Entity\Attribute:
+    # Zaak
+    zaak_identificatie:
+        name: identificatie
+        type: string
+        maxLength: 255
+        entity: '@zaak'
+    zaak_bronorganisatie:
+        name: bronorganisatie
+        type: string
+        maxLength: 9
+        entity: '@zaak'
+        required: true
+    zaak_omschrijving:
+        name: omschrijving
+        type: string
+        maxLength: 255
+        entity: '@zaak'
+    zaak_toelichting:
+        name: toelichting
+        type: string
+        maxLength: 1000
+        entity: '@zaak'
+    zaak_zaaktype:
+        name: zaaktype
+        type: object
+        entity: '@zaak'  
+        object: '@zaaktype'
+        required: true
+    zaak_registratiedatum:
+        name: registratiedatum
+        type: date
+        entity: '@zaak'
+    zaak_verantwoordelijkeOrganisatie:
+        name: verantwoordelijkeOrganisatie
+        type: string
+        maxLength: 9
+        entity: '@zaak'
+        required: true
+    zaak_startdatum:
+        name: startdatum
+        type: date
+        entity: '@zaak'
+        required: true
+    zaak_einddatumGepland:
+        name: einddatumGepland
+        type: date
+        entity: '@zaak'
+    zaak_uiterlijkeEinddatumAfdoening:
+        name: uiterlijkeEinddatumAfdoening
+        type: date
+        entity: '@zaak'
+    zaak_publicatiedatum:
+        name: publicatiedatum
+        type: date
+        entity: '@zaak'
+    zaak_communicatiekanaal:
+        name: communicatiekanaal
+        type: string
+        maxLength: 1000
+        entity: '@zaak'
+    zaak_productenOfDiensten:
+        name: productenOfDiensten
+        type: string
+        maxLength: 250
+        entity: '@zaak'
+        multiple: true
+    zaak_vertrouwelijkheidaanduiding:
+        name: vertrouwelijkheidaanduiding
+        type: string
+        maxLength: 255
+        enum: ["openbaar","beperkt_openbaar","intern","zaakvertrouwelijk","vertrouwelijk","confidentieel","geheim","zeer_geheim"]
+        entity: '@zaak'
+    zaak_betalingsindicatie:
+        name: betalingsindicatie
+        type: string
+        maxLength: 255
+        enum: ["nvt","nog_niet","gedeeltelijk","geheel"]
+        entity: '@zaak'
+    zaak_zaakgeometrie:
+        name: zaakgeometrie
+        type: object
+        entity: '@zaak'
+        object: '@zaakgeometrie'
+    zaak_verlenging:
+        name: verlenging
+        type: object
+        entity: '@zaak'
+        object: '@verlenging'
+    zaak_opschorting:
+        name: opschorting
+        type: object
+        entity: '@zaak'
+        object: '@opschorting'
+    zaak_selectielijstklasse:
+        name: selectielijstklasse
+        type: string
+        maxLength: 1000
+        entity: '@zaak'
+    zaak_hoofdzaak:
+        name: hoofdzaak
+        type: url
+        entity: '@zaak'
+    zaak_relevanteAndereZaken:
+        name: relevanteAndereZaken
+        type: object
+        entity: '@zaak'
+        object: '@relevanteZaak'        
+    zaak_kenmerken:
+        name: kenmerken
+        type: string
+        maxLength: 250
+        multiple: true
+        entity: '@zaak'
+    zaak_archiefnominatie:
+        name: archiefnominatie
+        type: string
+        maxLength: 255
+        enum: ["blijvend_bewaren","vernietigen"]
+        entity: '@zaak'
+    zaak_archiefstatus:
+        name: archiefstatus
+        type: string
+        maxLength: 255
+        enum: ["nog_te_archiveren","gearchiveerd","gearchiveerd_procestermijn_onbekend","overgedragen"]
+        entity: '@zaak'
+    zaak_archiefactiedatum:
+        name: archiefactiedatum
+        type: date
+        entity: '@zaak'
+    zaak_opdrachtgevendeOrganisatie:
+        name: opdrachtgevendeOrganisatie
+        type: string
+        maxLength: 1000
+        entity: '@zaak'
+
+    # relevanteZaak
+    relevanteZaak_uri:
+        name: uri
+        type: url
+        entity: '@relevanteZaak'
+    relevanteZaak_aardRelatie:
+        name: aardRelatie
+        type: string
+        enum: ["vervolg","onderwerp","bijdrage"]
+        entity: '@relevanteZaak'
+        
+    # opschorting
+    opschorting_indicatie:
+        name: indicatie
+        type: boolean
+        entity: '@opschorting'
+        required: true
+    opschorting_reden:
+        name: reden
+        type: string
+        maxLength: 200
+        entity: '@opschorting'
+        required: true
+        
+    # verlenging
+    verlenging_duur:
+        name: verlenging_duur
+        type: duration
+        entity: '@verlenging'
+        required: true
+    verlenging_reden:
+        name: reden
+        type: string
+        maxLength: 200
+        entity: '@verlenging'
+        required: true
+
+    # zaakverzoek
+    zaakverzoek_zaak:
+        name: zaak
+        type: object
+        entity: '@zaakverzoek'
+        object: '@zaak'
+        required: true
+    zaakverzoek_verzoek:
+        name: verzoek
+        type: object
+        entity: '@zaakverzoek'
+        object: '@verzoek'
+        required: true
+        
+    # zaakobject => nog uitwerken
+    zaakobject_zaak:
+        name: zaak
+        type: object
+        entity: '@zaakobject'
+        object: '@zaak'
+        required: true
+    zaakobject_object:
+        name: object
+        type: uri
+        maxLength: 1000
+        entity: '@zaakobject'
+        
+    # zaakinformatieobject
+    zaakinformatieobject_zaak:
+        name: zaak
+        type: object
+        entity: '@zaakinformatieobject'
+        object: '@zaak'
+        required: true
+    zaakinformatieobject_informatieobject:
+        name: object
+        type: uri
+        maxLength: 1000
+        entity: '@zaakinformatieobject'
+        object: '@informatieobject'
+        required: true
+    zaakinformatieobject_titel:
+        name: titel
+        type: string
+        maxLength: 1000
+        entity: '@zaakinformatieobject'
+    zaakinformatieobject_beschrijving:
+        name: beschrijving
+        type: string
+        maxLength: 1000
+        entity: '@zaakinformatieobject'
+
+    # zaakcontactmoment
+    zaakcontactmoment_zaak:
+        name: zaak
+        type: object
+        entity: '@zaakcontactmoment'
+        object: '@zaak'
+        required: true
+    zaakcontactmoment_contactmoment:
+        name: contactmoment
+        type: object
+        entity: '@zaakcontactmoment'
+        object: '@contactmoment'
+        required: true
+
+    # Status
+    status_zaak:
+        name: zaak
+        type: object
+        entity: '@status'
+        object: '@zaak'
+        required: true
+    status_statustype:
+        name: statustype
+        type: object
+        entity: '@status'
+        object: '@statustype'
+        required: true
+    status_datumStatusGezet:
+        name: datumStatusGezet
+        type: datetime
+        entity: '@status'
+        required: true
+    status_statustoelichting:
+        name: statustoelichting
+        type: string
+        maxLength: 1000
+        entity: '@status'
+
+    # rol
+    rol_zaak:
+        name: zaak
+        type: object
+        entity: '@rol'
+        object: '@zaak'
+        required: true
+    rol_betrokkene:
+        name: betrokkene
+        type: uri
+        maxLength: 1000
+        entity: '@rol'
+    rol_betrokkeneType:
+        name: betrokkeneType
+        type: string
+        enum: ["natuurlijk_persoon","niet_natuurlijk_persoon","vestiging","organisatorische_eenheid","medewerker"]
+        entity: '@rol'
+    rol_roltype:
+        name: roltype
+        type: object
+        entity: '@rol'
+        object: '@roltypen'
+        required: true
+    rol_roltoelichting:
+        name: roltoelichting
+        type: string
+        maxLength: 1000
+        entity: '@rol'
+    rol_indicatieMachtiging:
+        name: indicatieMachtiging
+        type: string
+        enum: ["gemachtigde","machtiginggever"]
+        entity: '@rol'
+    rol_betrokkeneIdentificatie: # @todo uitwerken
+        name: betrokkeneIdentificatie
+        type: array
+        entity: '@rol'
