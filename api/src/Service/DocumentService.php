@@ -42,7 +42,20 @@ class DocumentService
      */
     private function getData(Document $document, string $dataId): string
     {
-        $data = json_decode($this->serializer->serialize($this->responseService->renderResult($this->eavService->getObject($dataId, 'GET', $document->getEntity()), ['properties']), 'json'), true);
+        // opgeven van vertalingen
+        $translationVariables =[
+            ""=>"",
+            ""=>"",
+            ""=>"",
+            ""=>"",
+            ""=>"",
+        ];
+
+        $data = $this->serializer->serialize($this->responseService->renderResult($this->eavService->getObject($dataId, 'GET', $document->getEntity()), ['properties']), 'json');
+
+        $data = $this->translationService->parse($data, true, $translationVariables);
+        $data = json_decode($data, true);
+
         if (isset($data['id'])) {
             unset($data['id']);
         }
