@@ -111,11 +111,13 @@ class HandlerService
         if (!$skeleton || empty($skeleton)) {
             $skeleton = $data;
         }
+
         $data = $this->translationService->dotHydrator($skeleton, $data, $handler->getMappingIn());
 
         // The we want to do  translations on the incomming request
         $transRepo = $this->entityManager->getRepository('App:Translation');
         $translations = $transRepo->getTranslations($handler->getTranslationsIn());
+
         $data = $this->translationService->parse($data, true, $translations);
 
         // If the handler is teid to an EAV object we want to resolve that in all of it glory
@@ -126,43 +128,49 @@ class HandlerService
             if (array_key_exists('id', $routeParameters)) {
                 $id = $routeParameters['id'];
             }
-            $object = $this->eavService->getObject($id ?? null, $this->request->getMethod(), $entity);
 
             // Create an info array
             $info = [
-                "object" => $object ?? null,
+                //"object" => $object ?? null,
+                "id" => $id ?? null,
                 "body" => $data ?? null,
                 "fields" => $field ?? null,
+                "result" => $field ?? null,
                 "path" => $handler->getEndpoint()->getPath(),
+                'renderType' => $this->getRequestContentType(),
             ];
-            // Handle the eav side of things
-            if (isset($id)) {
-                $data = $this->eavService->handleEntityEndpoint($this->request, $info);
-            } else {
-                $data = $this->eavService->handleCollectionEndpoint($this->request, $info);
-            }
+
+            // @todo below  code  wil trigger an acces error
+            //$data =  $this->eavService->generateResult($this->request, $entity, $info, $data);
+
+            // @todo catch error
         }
 
         // The we want to do  translations on the outgoing responce
         $transRepo = $this->entityManager->getRepository('App:Translation');
         $translations = $transRepo->getTranslations($handler->getTranslationsOut());
-        if (isset($data['result'])) {
-            $data['result'] = $this->translationService->parse($data['result'], true, $translations);
-        } else {
-            $data = $this->translationService->parse($data, true, $translations);
-        }
 
         // Then we want to do to mapping on the outgoing responce
         $skeleton = $handler->getSkeletonOut();
         if (!$skeleton || empty($skeleton)) {
-            isset($data['result']) ? $skeleton = $data['result'] : $skeleton = $data;
-        }
-        if (isset($data['result'])) {
-            $data['result'] = $this->translationService->dotHydrator($skeleton, $data['result'], $handler->getMappingOut());
-        } else {
-            $data = $this->translationService->dotHydrator($skeleton, $data, $handler->getMappingOut());
+            $skeleton = $data;
         }
 
+        // Now we have to options, we iether have a set of results or a single result
+        if(array_key_exists('results', $data)){
+            foreach($data['results'] as $key => $value){
+                // Translation
+                $data['results'][$key] = $this->translationService->parse( $data['results'][$key], true, $translations);
+                // Mapping
+                $data['results'][$key] =  $this->translationService->dotHydrator($skeleton, $data['results'][$key], $handler->getMappingOut());
+            }
+        }
+        else {
+            // Translation
+            $data = $this->translationService->parse( $data, true, $translations);
+            // Mapping
+            $data =  $this->translationService->dotHydrator($skeleton, $data, $handler->getMappingOut());
+        }
 
         // Lets see if we need te use a template
         if ($handler->getTemplatetype() && $handler->getTemplate()) {
@@ -260,7 +268,7 @@ class HandlerService
         }
 
         // Lets seriliaze the shizle
-        $result = $this->serializer->serialize($data['result'], $contentType, $options);
+        $result = $this->serializer->serialize($data, $contentType, $options);
 
         // Lets create the actual response
         $response = new Response(

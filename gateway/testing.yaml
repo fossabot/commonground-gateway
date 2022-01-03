@@ -93,13 +93,33 @@ App\Entity\Handler:
         # templateType: twig
 
 App\Entity\Translation:
-    regenTranslation:
+    nlTranslation1:
         translationTable: weatherTable1
         translateFrom: zonnig
-        translateTo: regen
+        translateTo: sunny
         language: nl
-    rainTranslation:
-        translationTable: weatherTable2
+    nlTranslation2:
+        translationTable: weatherTable1
         translateFrom: regen
+        translateTo: rain
+        language: nl
+    nlTranslation3:
+        translationTable: weatherTable1
+        translateFrom: mist
+        translateTo: misty
+        language: nl
+    duTranslation1:
+        translationTable: weatherTable2
+        translateFrom: sunny
+        translateTo: sonnig
+        language: de
+    duTranslation2:
+        translationTable: weatherTable2
+        translateFrom: rain
         translateTo: sturm
+        language: de
+    duTranslation3:
+        translationTable: weatherTable2
+        translateFrom: misty
+        translateTo: nebelig
         language: de
