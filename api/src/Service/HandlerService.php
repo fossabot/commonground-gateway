@@ -142,8 +142,18 @@ class HandlerService
 
             // @todo below  code  wil trigger an acces error
             //$data =  $this->eavService->generateResult($this->request, $entity, $info, $data);
+            //var_dump($data);
 
-            // @todo catch error
+            if(is_object($data)){
+                $data->toArray();
+            }
+            elseif(array_key_exists('results',$data)){
+                // is een array van objecten
+            }
+            else{
+
+                // @todo catch error
+            }
         }
 
         // The we want to do  translations on the outgoing responce
