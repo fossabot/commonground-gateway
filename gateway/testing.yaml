@@ -108,6 +108,11 @@ App\Entity\Translation:
         translateFrom: mist
         translateTo: misty
         language: nl
+    nlTranslation4:
+        translationTable: weatherTable1
+        translateFrom: sneeuw
+        translateTo: snow
+        language: nl
     duTranslation1:
         translationTable: weatherTable2
         translateFrom: sunny
@@ -122,4 +127,9 @@ App\Entity\Translation:
         translationTable: weatherTable2
         translateFrom: misty
         translateTo: nebelig
+        language: de
+    duTranslation4:
+        translationTable: weatherTable2
+        translateFrom: snow
+        translateTo: schnee
         language: de
