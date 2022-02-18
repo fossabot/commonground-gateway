@@ -1,5 +1,3 @@
-## Sources
-
 Sources form the beating heart of the gateway. A source represents an external API (registered or microservice in nature) possibly exposed through the web gateway.
 
 Adding an API as a source WILL NOT leave that API exposed. API’s might be added manually through discovery. Discovery methods currently on the roadmap are NLX, Autorisatie Component, and Generic Kubernetes services.

@@ -1,3 +1,1 @@
-## Configurations
-
 This `configurations` tab is to export your configurations for back-up convience or easy sharing with team members. Clicking the export configurations button will automatically download an `export.yaml` file with your Gateway configuration.

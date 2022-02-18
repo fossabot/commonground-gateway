@@ -1,5 +1,3 @@
-## Object-types
-
 This is where _Entities_ are defined for the objects to be stored. Entities are object that exists.
 Entities don't have to do anything, they just exist. For an entity to be useful as an object, attributes are needed and can be specified in section of the dashboard.
 

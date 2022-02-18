@@ -1,5 +1,3 @@
-## Translations
-
 This is how you can configure the automation of object in need of translation.
 
 Let's picture a JSON object(although handlers also accept XML /SOAP):
