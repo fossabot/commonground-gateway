@@ -1,0 +1,118 @@
+App\Entity\Gateway:
+    buckaroo:
+        name: buckaroo
+        auth: hmac
+        apikey: fcT9M4KMa8 #WEBSITE_KEY
+        secret: 25432A462D4A614E635266556A586E32
+        location: https://testcheckout.buckaroo.nl/json
+
+App\Entity\Entity:
+    # Transaction Object
+    transaction:
+        route: '/api/transaction'
+        name: transaction
+        description: Transactions.
+        gateway: '@buckaroo'
+        endpoint: 'Transaction'
+    
+    # Transaction Services Object
+    transaction_services:
+        name: services
+        description: Transaction services.
+        
+    # Transaction Services PaymentMethod Object
+    paymentMethod:
+        name: paymentMethod
+        description: Transaction services paymentMethod.
+        
+    # Transaction Services PaymentMethod Parameter Object
+    paymentMethod_parameter:
+        name: parameter
+        description: Transaction services paymentMethod parameter.        
+
+App\Entity\Attribute:
+    # Transaction attributes
+    transaction_currency:
+        name: Currency
+        description: The currency of this transaction
+        type: string
+        persistToGateway: true
+        entity: '@transaction'
+        required: true
+    transaction_amount_debit:
+        name: AmountDebit
+        description: The amount debit of this transaction
+        type: float
+        persistToGateway: true
+        entity: '@transaction'
+        required: true
+    transaction_invoice:
+        name: Invoice
+        description: The invoice of this transaction
+        type: string
+        persistToGateway: true
+        entity: '@transaction'
+        required: true
+    transaction_services:
+        name: Services
+        description: The services of this transaction
+        type: object
+        persistToGateway: true
+        entity: '@transaction'
+        object: "@transaction_services"
+        required: true
+        
+    # Transaction Services attributes
+    transaction_services_service_list:
+        name: ServiceList
+        description: The service list with payment methods of this transaction services
+        type: object
+        multiple: true
+        persistToGateway: true
+        entity: '@transaction_services'
+        object: '@paymentMethod'
+        required: true
+        # probably should not contain duplicates?
+        
+    # Transaction Services PaymentMethod attributes
+    paymentMethod_name:
+        name: Name
+        description: The name of this payment method
+        type: string
+        persistToGateway: true
+        entity: '@paymentMethod'
+        defaultValue: "ideal"
+        enum: ["ideal"]
+    paymentMethod_action:
+        name: Action
+        description: The action of this payment method
+        type: string
+        persistToGateway: true
+        entity: '@paymentMethod'
+        defaultValue: "Pay"
+        enum: [ "Pay" ]
+    paymentMethod_parameters:
+        name: Parameters
+        description: The parameters of this payment method
+        type: object
+        multiple: true
+        persistToGateway: true
+        entity: '@paymentMethod'
+        object: '@paymentMethod_parameter'
+        # required?
+        
+    # Transaction Services PaymentMethod Parameter attributes
+    paymentMethod_parameter_name:
+        name: Name
+        description: The name of this payment method parameter
+        type: string
+        persistToGateway: true
+        entity: '@paymentMethod_parameter'
+        required: true
+    paymentMethod_parameter_value:
+        name: Value
+        description: The value of this payment method parameter
+        type: string
+        persistToGateway: true
+        entity: '@paymentMethod_parameter'
+        required: true

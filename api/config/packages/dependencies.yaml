@@ -1,5 +1,10 @@
 parameters:
     components:
+        buckaroo:
+            auth: hmac
+            apikey: fcT9M4KMa8 #WEBSITE_KEY
+            secret: 25432A462D4A614E635266556A586E32
+            location: https://testcheckout.buckaroo.nl/json
         brp:
             auth: username-password
             location: http://vrij-brp.demodam.nl/haal-centraal-brp-bevragen/api/v1.3
