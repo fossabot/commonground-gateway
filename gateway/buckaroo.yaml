@@ -13,10 +13,10 @@ App\Entity\Entity:
         name: transaction
         description: Transactions.
         gateway: '@buckaroo'
-        endpoint: 'Transaction'
+        endpoint: 'transaction'
     
     # Transaction Services Object
-    transaction_services:
+    services:
         name: services
         description: Transaction services.
         
@@ -28,7 +28,15 @@ App\Entity\Entity:
     # Transaction Services PaymentMethod Parameter Object
     paymentMethod_parameter:
         name: parameter
-        description: Transaction services paymentMethod parameter.        
+        description: Transaction services paymentMethod parameter.
+        
+#    # TransactionStatus Object
+#    transactionStatus:
+#        route: '/api/transaction/status'
+#        name: transactionStatus
+#        description: Transaction status.
+#        gateway: '@buckaroo'
+#        endpoint: 'transaction/status'
 
 App\Entity\Attribute:
     # Transaction attributes
@@ -42,7 +50,7 @@ App\Entity\Attribute:
     transaction_amount_debit:
         name: AmountDebit
         description: The amount debit of this transaction
-        type: float
+        type: number
         persistToGateway: true
         entity: '@transaction'
         required: true
@@ -57,19 +65,21 @@ App\Entity\Attribute:
         name: Services
         description: The services of this transaction
         type: object
+        cascade: true
         persistToGateway: true
         entity: '@transaction'
-        object: "@transaction_services"
+        object: "@services"
         required: true
         
     # Transaction Services attributes
-    transaction_services_service_list:
+    services_service_list:
         name: ServiceList
         description: The service list with payment methods of this transaction services
         type: object
+        cascade: true
         multiple: true
         persistToGateway: true
-        entity: '@transaction_services'
+        entity: '@services'
         object: '@paymentMethod'
         required: true
         # probably should not contain duplicates?
@@ -95,6 +105,7 @@ App\Entity\Attribute:
         name: Parameters
         description: The parameters of this payment method
         type: object
+        cascade: true
         multiple: true
         persistToGateway: true
         entity: '@paymentMethod'

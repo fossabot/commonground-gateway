@@ -203,9 +203,16 @@ class ValidationService
         if (!$objectEntity->getHasErrors()) {
             if ($objectEntity->getEntity()->getGateway()) {
                 // We notify the notification component here in the createPromise function:
-                $promise = $this->createPromise($objectEntity, $post);
-                $this->promises[] = $promise; //TODO: use ObjectEntity->promises instead!
-                $objectEntity->addPromise($promise);
+                if ($objectEntity->getEntity()->getGateway()->getAuth() == "hmac") {
+                    // TODO: switch en prevent errors :)
+                    $component = $this->gatewayService->gatewayToArray($objectEntity->getEntity()->getGateway());
+                    $url = $objectEntity->getEntity()->getGateway()->getLocation().'/'.$objectEntity->getEntity()->getEndpoint();
+                    $this->commonGroundService->callService($component, $url, json_encode($post), [], [], false, $this->request->getMethod());
+                } else {
+                    $promise = $this->createPromise($objectEntity, $post);
+                    $this->promises[] = $promise; //TODO: use ObjectEntity->promises instead!
+                    $objectEntity->addPromise($promise);
+                }
             } else {
                 if (!$objectEntity->getUri()) {
                     // Lets make sure we always set the uri
