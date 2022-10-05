@@ -13,6 +13,7 @@ use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Twig\Environment as Twig;
+use App\Entity\Gateway;
 
 class WaardepapierenService
 {
@@ -236,7 +237,7 @@ class WaardepapierenService
     public function createClaim(array $certificate)
     {
         // Lets add data to this claim
-        $claimData = $certificate['claimData'];
+        isset($certificate['claimData']) ? $claimData = $certificate['claimData'] : [];
 
         isset($certificate['data']) && $claimData = $certificate['data'];
 
@@ -290,10 +291,16 @@ class WaardepapierenService
         $certificate = $data['response'];
         $this->configuration = $configuration;
 
+        $pinkBRPGateway = $this->entityManager->find('App:Gateway', $configuration['source']);
+
+        if (!$pinkBRPGateway instanceof Gateway) {
+            throw new \Exception('PinkBRP gateway could not be found');
+        }
+
         // 1. Haal persoonsgegevens op bij pink brp 
-        // do guzzle call or use a function from the synchronization service
+        // get persoonsgegevens with $pinkBRPGateway
 
-
+        // Test object
         $certificate['person'] = 'http://localhost/api/ingeschrevenpersonen/1234567';
         $certificate['personObject'] = [
             'id'                     => '1234567',
@@ -303,12 +310,11 @@ class WaardepapierenService
         ];
 
         // 2. Vul data van certificate in
+        $certificate['claimData']['persoon'] = $certificate['person'];
+        $certificate['claimData']['type'] = $certificate['type'];
         $certificate = $this->createClaim($certificate);
         // $certificate = $this->createImage($certificate);
         $certificate = $this->createDocument($certificate);
-
-        // var_dump(json_encode($certificate));
-        // die;
 
         $certificate['personObject'] = json_encode($certificate['personObject']);
         $certificate['irma'] = json_encode($certificate['irma']);
@@ -319,10 +325,8 @@ class WaardepapierenService
         $this->entityManager->persist($certificateObjectEntity);
         $this->entityManager->flush();
 
-        // $certificateObjectEntity = $this->objectEntityRepo->find($certificate['id']);
+        $certificate = $certificateObjectEntity->toArray();
 
-        // $certificate = $certificateObjectEntity->toArray();
-
-        return $certificate;
+        return ['response' => $certificate];
     }
 }
