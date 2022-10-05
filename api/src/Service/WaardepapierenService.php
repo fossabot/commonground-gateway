@@ -196,7 +196,7 @@ class WaardepapierenService
      * @param array $data          Data from the handler where the xxllnc casetype is in.
      * @param array $configuration Configuration from the Action where the ZaakType entity id is stored in.
      *
-     * @return array $this->data Data which we entered the function with
+     * @return array $certificate Certificate which we updated with new data
      */
     public function waardepapierenHandler(array $data, array $configuration): array
     {
@@ -205,15 +205,20 @@ class WaardepapierenService
 
 
         // 1. Check of type waardepapier valid is   
+        // switch ($certificate['type']) {
+        //     case 'uittreksel_':
+        //         break;
+        //     default:
+        //         break;
+        // }
 
 
         // 2. Haal persoonsgegevens op bij pink brp 
+        // do guzzle call or use a function from the synchronization service
 
 
         // 3. Vul data van certificate in op basis van type en persoonsgegevens
-
-
-
+        // $certificate = $this->create 
 
         var_dump('test waardepapieren plugin');
         die;
