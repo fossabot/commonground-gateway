@@ -5,13 +5,14 @@ namespace App\Service;
 use App\Entity\Entity;
 use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
-use Endroid\QrCode\QrCode;
-use Endroid\QrCodeBundle\Response\QrCodeResponse;
+// use Endroid\QrCode\QrCode;
+// use Endroid\QrCodeBundle\Response\QrCodeResponse;
 use Dompdf\Dompdf;
 use Jose\Component\Core\AlgorithmManager;
 use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\RS512;
 use Jose\Component\Signature\Serializer\CompactSerializer;
+use Twig\Environment as Twig;
 
 class WaardepapierenService
 {
@@ -22,7 +23,8 @@ class WaardepapierenService
     private SynchronizationService $synchronizationService;
     private array $configuration;
     private array $data;
-    private QrCode $qrCode;
+    private $twig;
+    // private QrCode $qrCode;
 
     /**
      * @param EntityManagerInterface $entityManager
@@ -31,41 +33,43 @@ class WaardepapierenService
         EntityManagerInterface $entityManager,
         ObjectEntityService $objectEntityService,
         SynchronizationService $synchronizationService,
-        QrCode $qrCode
+        Twig $twig
+        // QrCode $qrCode
     ) {
         $this->entityManager = $entityManager;
         $this->objectEntityService = $objectEntityService;
         $this->synchronizationService = $synchronizationService;
-        $this->qrCode = $qrCode;
+        $this->twig = $twig;
+        // $this->qrCode = $qrCode;
 
         $this->objectEntityRepo = $this->entityManager->getRepository(ObjectEntity::class);
         $this->entityRepo = $this->entityManager->getRepository(Entity::class);
     }
 
-    /**
-     * This function creates a QR code for the given claim.
-     *
-     * @param array $certificate The certificate object
-     *
-     * @return array The modified certificate object
-     */
-    public function createImage(array $certificate = [])
-    {
-        // TODO testing, might not work
+    // /**
+    //  * This function creates a QR code for the given claim.
+    //  *
+    //  * @param array $certificate The certificate object
+    //  *
+    //  * @return array The modified certificate object
+    //  */
+    // public function createImage(array $certificate = [])
+    // {
+    //     // TODO testing, might not work
 
-        // Then we need to render the QR code
-        $qrCode = $this->qrCode->create($certificate['jwt'], [
-            'size'  => 1000,
-            'margin' => 1,
-            'writer' => 'png',
-        ]);
-        // $response = new QrCodeResponse($qrCode);
+    //     // Then we need to render the QR code
+    //     $qrCode = $this->qrCode->create($certificate['jwt'], [
+    //         'size'  => 1000,
+    //         'margin' => 1,
+    //         'writer' => 'png',
+    //     ]);
+    //     // $response = new QrCodeResponse($qrCode);
 
-        // And finnaly we need to set the result on the certificate resource
-        $certificate['image'] = 'data:image/png;base64,' . base64_encode($qrCode);
+    //     // And finnaly we need to set the result on the certificate resource
+    //     $certificate['image'] = 'data:image/png;base64,' . base64_encode($qrCode);
 
-        return $certificate;
-    }
+    //     return $certificate;
+    // }
 
     /**
      * This function generates a claim based on the w3c structure.
@@ -108,10 +112,10 @@ class WaardepapierenService
     {
         $proof = [];
         $proof['type'] = 'RsaSignature';
-        $proof['created'] = date('H:i:s d-m-Y', filectime("cert/{" . $certificate['organization'] . "}.pem"));
+        // $proof['created'] = date('H:i:s d-m-Y', filectime("cert/{" . $certificate['organization'] . "}.pem"));
         $proof['proofPurpose'] = 'assertionMethode';
-        $proof['verificationMethod'] = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . "/cert/{" . $certificate['organization'] . "}.pem";
-        $proof['jws'] = $this->createJWS($certificate, $data['credentialSubject']);
+        // $proof['verificationMethod'] = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . "/cert/{" . $certificate['organization'] . "}.pem";
+        // $proof['jws'] = $this->createJWS($certificate, $data['credentialSubject']);
 
         return $proof;
     }
@@ -177,8 +181,8 @@ class WaardepapierenService
         // }
 
         // First we need the HTML  for the template
-        // $html = $this->twig->render('certificates/'.$certificate->getType().'.html.twig', array_filter($data));
-        $html = $this->twig->render('certificates/' . $certificate['type'] . '.html.twig', array_filter($data));
+        // $html = $this->twig->render('certificates/' . $certificate->getType() . '.html.twig', array_filter($data));
+        $html = json_encode($data);
 
         // Then we need to render the template
         $dompdf = new DOMPDF();
@@ -268,7 +272,7 @@ class WaardepapierenService
         // Create token payload as a JSON string
         $certificate['irma'] = $certificate['discipl'];
 
-        $certificate['jwt'] = $this->createJWT($certificate);;
+        // $certificate['jwt'] = $this->createJWT($certificate);;
 
         return $certificate;
     }
@@ -290,15 +294,35 @@ class WaardepapierenService
         // do guzzle call or use a function from the synchronization service
 
 
+        $certificate['person'] = 'http://localhost/api/ingeschrevenpersonen/1234567';
+        $certificate['personObject'] = [
+            'id'                     => '1234567',
+            '@id'                    => 'http://localhost/api/ingeschrevenpersonen/1234567',
+            'burgerservicenummer'    => '1234567',
+            'naam' => 'Barry Brands'
+        ];
+
         // 2. Vul data van certificate in
         $certificate = $this->createClaim($certificate);
-        $certificate = $this->createImage($certificate);
+        // $certificate = $this->createImage($certificate);
         $certificate = $this->createDocument($certificate);
 
-        var_dump('test waardepapieren plugin');
-        die;
+        // var_dump(json_encode($certificate));
+        // die;
 
+        $certificate['personObject'] = json_encode($certificate['personObject']);
+        $certificate['irma'] = json_encode($certificate['irma']);
+        $certificate['discipl'] = json_encode($certificate['discipl']);
 
-        return $this->data;
+        $certificateObjectEntity = $this->objectEntityRepo->find($certificate['id']);
+        $certificateObjectEntity->hydrate($certificate);
+        $this->entityManager->persist($certificateObjectEntity);
+        $this->entityManager->flush();
+
+        // $certificateObjectEntity = $this->objectEntityRepo->find($certificate['id']);
+
+        // $certificate = $certificateObjectEntity->toArray();
+
+        return $certificate;
     }
 }
