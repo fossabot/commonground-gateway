@@ -231,28 +231,22 @@ class WaardepapierenService
      */
     public function createClaim(array $certificate)
     {
-
         // Lets add data to this claim
         $claimData = $certificate['claimData'];
 
-        if (isset($certificate['data'])) {
-            $claimData = $certificate['data'];
-        }
+        isset($certificate['data']) && $claimData = $certificate['data'];
 
         // switch ($certificate['type']) {
         // }
 
         $certificate['w3c'] = $this->w3cClaim($claimData, $certificate);
-        if (isset($certificate['person'])) {
-            $claimData['persoon'] = $certificate['personObject']['burgerservicenummer'];
-        }
+        isset($certificate['person']) && $claimData['persoon'] = $certificate['personObject']['burgerservicenummer'];
 
         $claimData['doel'] = $certificate['type'];
-
         $certificate['claimData'] = $claimData;
 
         // Create token payload as a JSON string
-        $claim = [
+        $certificate['claim'] = [
             'iss'                 => $certificate['id'],
             'user_id'             => $certificate['personObject']['id'] ?? $certificate['organization'],
             'user_representation' => $certificate['personObject']['@id'] ?? $certificate['organization'],
@@ -260,21 +254,19 @@ class WaardepapierenService
             // 'validation_uri'      => $this->commonGroundService->cleanUrl(['component' => 'frontend', 'type' => 'claims/public_keys', 'id' => $certificate->getOrganization()]),
             'iat'                 => time(),
         ];
-        $certificate['claim'] = $claim;
 
         // Create token payload as a JSON string
-        $discipl = [
+        $certificate['discipl'] = [
             'claimData' => [
                 'did:discipl:ephemeral:crt:4c86faf535029c8cf4a371813cc44cb434875b18' => [
-                    'link:discipl:ephemeral:tEi6K3mPRmE6QRf4WvpxY1hQgGmIG7uDV85zQILQNSCnQjAZPg2mj4Fbok/BHL9C8mFJQ1tCswBHBtsu6NIESA45XnN13pE+nLD6IPOeHx2cUrObxtzsqLhAy4ZXN6eDpZDmqnb6ymELUfXu/D2n4rL/t9aD279vqjFRKgBVE5WsId9c6KEYA+76mBQUBoJr8sF7w+3oMjzKy88oW693I3Keu+cdl/9sRCyYAYIDzwmg3A6n8t9KUpsBDK1b6tNznA6qoiN9Zb4JZ7rpq6lnVpyU5pyJjD+p9DiWgIYsVauJy8WOcKfNWkeOomWez0of2o+gu9xf+VLzcX3MSiAfZA==' => $certificate->getClaimData(),
+                    'link:discipl:ephemeral:tEi6K3mPRmE6QRf4WvpxY1hQgGmIG7uDV85zQILQNSCnQjAZPg2mj4Fbok/BHL9C8mFJQ1tCswBHBtsu6NIESA45XnN13pE+nLD6IPOeHx2cUrObxtzsqLhAy4ZXN6eDpZDmqnb6ymELUfXu/D2n4rL/t9aD279vqjFRKgBVE5WsId9c6KEYA+76mBQUBoJr8sF7w+3oMjzKy88oW693I3Keu+cdl/9sRCyYAYIDzwmg3A6n8t9KUpsBDK1b6tNznA6qoiN9Zb4JZ7rpq6lnVpyU5pyJjD+p9DiWgIYsVauJy8WOcKfNWkeOomWez0of2o+gu9xf+VLzcX3MSiAfZA==' => $certificate['claimData'],
                 ],
             ],
-            'metadata' => ['cert' => 'zuid-drecht.nl:8080'],
+            'metadata' => ['cert' => 'localhost:8080'],
         ];
-        $certificate['discipl'] = $discipl;
 
         // Create token payload as a JSON string
-        $certificate['irma'] = $discipl;
+        $certificate['irma'] = $certificate['discipl'];
 
         $certificate['jwt'] = $this->createJWT($certificate);;
 
