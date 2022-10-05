@@ -47,10 +47,11 @@ class WaardepapierenService
      *
      * @param array $certificate The certificate object
      *
-     * @return Certificate The modified certificate object
+     * @return array The modified certificate object
      */
     public function createImage(array $certificate = [])
     {
+        // TODO testing, might not work
 
         // Then we need to render the QR code
         $qrCode = $this->qrCode->create($certificate['jwt'], [
@@ -191,6 +192,96 @@ class WaardepapierenService
     }
 
     /**
+     * This function generates a jwt token using the claim that's available from the certificate object.
+     *
+     * @param array $certificate The certificate object
+     *
+     * @return string The generated jwt token
+     */
+    public function createJWT(array $certificate)
+    {
+        // Create a payload
+        $payload = $certificate['claim'];
+
+        $algorithmManager = new AlgorithmManager([
+            new RS512(),
+        ]);
+        $jwk = JWKFactory::createFromKeyFile(
+            "../cert/{" . $certificate['organization'] . "}.pem"
+        );
+        $jwsBuilder = new \Jose\Component\Signature\JWSBuilder($algorithmManager);
+        $jws = $jwsBuilder
+            ->create()
+            ->withPayload(json_encode($payload))
+            ->addSignature($jwk, ['alg' => 'RS512'])
+            ->build();
+        $serializer = new CompactSerializer();
+
+        return $serializer->serialize($jws, 0);
+    }
+
+    /**
+     * This function creates the claim based on the type defined in the certificate object.
+     *
+     * @param array $certificate The certificate object
+     *
+     * @throws \Exception
+     *
+     * @return array The modified certificate object
+     */
+    public function createClaim(array $certificate)
+    {
+
+        // Lets add data to this claim
+        $claimData = $certificate['claimData'];
+
+        if (isset($certificate['data'])) {
+            $claimData = $certificate['data'];
+        }
+
+        // switch ($certificate['type']) {
+        // }
+
+        $certificate['w3c'] = $this->w3cClaim($claimData, $certificate);
+        if (isset($certificate['person'])) {
+            $claimData['persoon'] = $certificate['personObject']['burgerservicenummer'];
+        }
+
+        $claimData['doel'] = $certificate['type'];
+
+        $certificate['claimData'] = $claimData;
+
+        // Create token payload as a JSON string
+        $claim = [
+            'iss'                 => $certificate['id'],
+            'user_id'             => $certificate['personObject']['id'] ?? $certificate['organization'],
+            'user_representation' => $certificate['personObject']['@id'] ?? $certificate['organization'],
+            'claim_data'          => $certificate['claimData'],
+            // 'validation_uri'      => $this->commonGroundService->cleanUrl(['component' => 'frontend', 'type' => 'claims/public_keys', 'id' => $certificate->getOrganization()]),
+            'iat'                 => time(),
+        ];
+        $certificate['claim'] = $claim;
+
+        // Create token payload as a JSON string
+        $discipl = [
+            'claimData' => [
+                'did:discipl:ephemeral:crt:4c86faf535029c8cf4a371813cc44cb434875b18' => [
+                    'link:discipl:ephemeral:tEi6K3mPRmE6QRf4WvpxY1hQgGmIG7uDV85zQILQNSCnQjAZPg2mj4Fbok/BHL9C8mFJQ1tCswBHBtsu6NIESA45XnN13pE+nLD6IPOeHx2cUrObxtzsqLhAy4ZXN6eDpZDmqnb6ymELUfXu/D2n4rL/t9aD279vqjFRKgBVE5WsId9c6KEYA+76mBQUBoJr8sF7w+3oMjzKy88oW693I3Keu+cdl/9sRCyYAYIDzwmg3A6n8t9KUpsBDK1b6tNznA6qoiN9Zb4JZ7rpq6lnVpyU5pyJjD+p9DiWgIYsVauJy8WOcKfNWkeOomWez0of2o+gu9xf+VLzcX3MSiAfZA==' => $certificate->getClaimData(),
+                ],
+            ],
+            'metadata' => ['cert' => 'zuid-drecht.nl:8080'],
+        ];
+        $certificate['discipl'] = $discipl;
+
+        // Create token payload as a JSON string
+        $certificate['irma'] = $discipl;
+
+        $certificate['jwt'] = $this->createJWT($certificate);;
+
+        return $certificate;
+    }
+
+    /**
      * Creates or updates a Certificate.
      *
      * @param array $data          Data from the handler where the xxllnc casetype is in.
@@ -203,22 +294,14 @@ class WaardepapierenService
         $certificate = $data['response'];
         $this->configuration = $configuration;
 
-
-        // 1. Check of type waardepapier valid is   
-        // switch ($certificate['type']) {
-        //     case 'uittreksel_':
-        //         break;
-        //     default:
-        //         break;
-        // }
-
-
-        // 2. Haal persoonsgegevens op bij pink brp 
+        // 1. Haal persoonsgegevens op bij pink brp 
         // do guzzle call or use a function from the synchronization service
 
 
-        // 3. Vul data van certificate in op basis van type en persoonsgegevens
-        // $certificate = $this->create 
+        // 2. Vul data van certificate in
+        $certificate = $this->createClaim($certificate);
+        $certificate = $this->createImage($certificate);
+        $certificate = $this->createDocument($certificate);
 
         var_dump('test waardepapieren plugin');
         die;
