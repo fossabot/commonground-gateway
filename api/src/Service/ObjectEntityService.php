@@ -805,11 +805,11 @@ class ObjectEntityService
                 // Note: attributes with function = id should also be readOnly and type=string
                 break;
             case 'self':
-                $objectEntity->getValueByAttribute($attribute)->setValue($objectEntity->getSelf() ?? $this->createSelf($objectEntity));
+                $objectEntity->getValueByAttribute($attribute)->setValue($objectEntity->getSelf() ?? $objectEntity->setSelf($this->createSelf($objectEntity))->getSelf());
                 // Note: attributes with function = self should also be readOnly and type=string
                 break;
             case 'uri':
-                $objectEntity->getValueByAttribute($attribute)->setValue($objectEntity->getUri() ?? $this->createUri($objectEntity));
+                $objectEntity->getValueByAttribute($attribute)->setValue($objectEntity->getUri() ?? $objectEntity->setUri($this->createUri($objectEntity))->getUri());
                 // Note: attributes with function = uri should also be readOnly and type=string
                 break;
             case 'externalId':
@@ -1098,12 +1098,12 @@ class ObjectEntityService
                     if (Uuid::isValid($value) == false) {
                         // We should also allow commonground Uri's like: https://taalhuizen-bisc.commonground.nu/api/v1/wrc/organizations/008750e5-0424-440e-aea0-443f7875fbfe
                         // TODO: support /$attribute->getObject()->getEndpoint()/uuid?
-                        if ($value == $attribute->getObject()->getGateway()->getLocation().'/'.$attribute->getObject()->getEndpoint().'/'.$this->commonGroundService->getUuidFromUrl($value)) {
-                            $value = $this->commonGroundService->getUuidFromUrl($value);
-                        } else {
-//                            var_dump('The given value ('.$value.') is not a valid object, a valid uuid or a valid uri ('.$attribute->getObject()->getGateway()->getLocation().'/'.$attribute->getObject()->getEndpoint().'/uuid).');
-                            break;
-                        }
+//                        if ($value == $attribute->getObject()->getGateway()->getLocation().'/'.$attribute->getObject()->getEndpoint().'/'.$this->commonGroundService->getUuidFromUrl($value)) {
+//                            $value = $this->commonGroundService->getUuidFromUrl($value);
+//                        } else {
+////                            var_dump('The given value ('.$value.') is not a valid object, a valid uuid or a valid uri ('.$attribute->getObject()->getGateway()->getLocation().'/'.$attribute->getObject()->getEndpoint().'/uuid).');
+//                            break;
+//                        }
                     }
 
                     // Look for object in the gateway with this id (for ObjectEntity id and for ObjectEntity externalId)
@@ -1558,9 +1558,9 @@ class ObjectEntityService
     {
         // We need to persist if this is a new ObjectEntity in order to set and getId to generate the self...
         $this->entityManager->persist($objectEntity);
-        $endpoint = $this->entityManager->getRepository('App:Endpoint')->findGetItemByEntity($objectEntity->getEntity());
-        if ($endpoint instanceof Endpoint) {
-            $pathArray = $endpoint->getPath();
+        $endpoints = $this->entityManager->getRepository('App:Endpoint')->findGetItemByEntity($objectEntity->getEntity());
+        if (count($endpoints) > 0 && $endpoints[0] instanceof Endpoint) {
+            $pathArray = $endpoints[0]->getPath();
             $foundId = in_array('{id}', $pathArray) ? $pathArray[array_search('{id}', $pathArray)] = $objectEntity->getId() :
                 (in_array('{uuid}', $pathArray) ? $pathArray[array_search('{uuid}', $pathArray)] = $objectEntity->getId() : false);
             if ($foundId !== false) {

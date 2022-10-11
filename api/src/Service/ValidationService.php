@@ -275,11 +275,11 @@ class ValidationService
                 // Note: attributes with function = id should also be readOnly and type=string
                 break;
             case 'self':
-                $objectEntity->getValueByAttribute($attribute)->setValue($objectEntity->getSelf() ?? $this->createSelf($objectEntity));
+                $objectEntity->getValueByAttribute($attribute)->setValue($objectEntity->getSelf() ?? $objectEntity->setSelf($this->createSelf($objectEntity))->getSelf());
                 // Note: attributes with function = self should also be readOnly and type=string
                 break;
             case 'uri':
-                $objectEntity->getValueByAttribute($attribute)->setValue($objectEntity->getUri() ?? $this->createUri($objectEntity));
+                $objectEntity->getValueByAttribute($attribute)->setValue($objectEntity->getUri() ?? $objectEntity->setUri($this->createUri($objectEntity))->getUri());
                 // Note: attributes with function = uri should also be readOnly and type=string
                 break;
             case 'externalId':
@@ -1946,10 +1946,11 @@ class ValidationService
     {
         // We need to persist if this is a new ObjectEntity in order to set and getId to generate the self...
         $this->em->persist($objectEntity);
-        $endpoint = $this->em->getRepository('App:Endpoint')->findGetItemByEntity($objectEntity->getEntity());
-        if ($endpoint instanceof Endpoint) {
-            $pathArray = $endpoint->getPath();
-            $foundId = in_array('{id}', $pathArray) ? $pathArray[array_search('{id}', $pathArray)] = $objectEntity->getId() : (in_array('{uuid}', $pathArray) ? $pathArray[array_search('{uuid}', $pathArray)] = $objectEntity->getId() : false);
+        $endpoints = $this->em->getRepository('App:Endpoint')->findGetItemByEntity($objectEntity->getEntity());
+        if (count($endpoints) > 0 && $endpoints[0] instanceof Endpoint) {
+            $pathArray = $endpoints[0]->getPath();
+            $foundId = in_array('{id}', $pathArray) ? $pathArray[array_search('{id}', $pathArray)] = $objectEntity->getId() :
+                (in_array('{uuid}', $pathArray) ? $pathArray[array_search('{uuid}', $pathArray)] = $objectEntity->getId() : false);
             if ($foundId !== false) {
                 $path = implode('/', $pathArray);
 
