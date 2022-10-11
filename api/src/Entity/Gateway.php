@@ -222,12 +222,12 @@ class Gateway
      * @Assert\Length(
      *      max = 255
      * )
-     * @Assert\Choice({"apikey", "jwt", "username-password", "none"})
+     * @Assert\Choice({"api-key", "bearer-token", "basic-auth","digest-auth","o-auth-1","o-auth-2","hawk-auth","aws-signature","ntlm-auth","akamai-edgegrid","jwt","jwt-HS256","jwt-RS512","jwt-vrij-brp","hmac","2way-ssl","none"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
      *             "type"="string",
-     *             "enum"={"api-key", "bearer-token", "basic-auth","digest-auth","o-auth-1","o-auth-2","hawk-auth","aws-signature","ntlm-auth","akamai-edgegrid","jwt","jwt-HS256","jwt-RS512","jwt-vrij-brp","hmac","2way-ssl","none"},
+     *             "enum"={ "api-key", "bearer-token", "basic-auth","digest-auth","o-auth-1","o-auth-2","hawk-auth","aws-signature","ntlm-auth","akamai-edgegrid","jwt","jwt-HS256","jwt-RS512","jwt-vrij-brp","hmac","2way-ssl","none"},
      *             "example"="apikey"
      *         }
      *     }
@@ -620,11 +620,27 @@ class Gateway
 
     public function getAuth(): string
     {
+        // @depraticed backward compatability
+        switch ($this->auth){
+            case "apikey":
+                return "api-key";
+            case "username-password":
+                return "basic-auth";
+        }
+
         return $this->auth;
     }
 
     public function setAuth(string $auth): self
     {
+        // @depraticed backward compatability
+        switch ($auth){
+            case "apikey":
+                $auth = "api-key";
+            case "username-password":
+                $auth = "basic-auth";
+        }
+
         $this->auth = $auth;
 
         return $this;
