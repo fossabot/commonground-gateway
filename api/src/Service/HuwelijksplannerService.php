@@ -89,6 +89,28 @@ class HuwelijksplannerService
      * @param array $data
      * @param array $configuration
      *
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function HuwelijksplannerAssentHandler(array $data, array $configuration): array
+    {
+        $this->data = $data;
+        $this->configuration = $configuration;
+
+        if (in_array('id', $this->data) && $huwelijk = $this->objectEntityService->getObject(null, $this->data['id'])) {
+            var_dump($huwelijk);
+        }
+
+        return $this->data;
+    }
+
+    /**
+     * Handles Huwelijkslnner actions.
+     *
+     * @param array $data
+     * @param array $configuration
+     *
      * @throws LoaderError|RuntimeError|SyntaxError|TransportExceptionInterface
      *
      * @return array
