@@ -27,7 +27,7 @@ class CallService
         ?array $requestOptions= [],
         ?bool $async = false
     ) {
-        /* Let overwrite request options, avalaibalne request options are
+        /* Let overwrite request options, available request options are
          *
          * 'body'        => $content,
             'method'      => $type,
@@ -36,10 +36,11 @@ class CallService
             'headers'     => $headers,
             'http_errors' => true,
          */
+
         $requestOptions = array_merge($source->getRequestOptions(), $requestOptions);
 
         // Lets set authentication
-        $requestOptions = array_merge($requestOptions, $source->getAuthorization($source));
+        $requestOptions =  $this->getAuthorization($source, $requestOptions);
 
         // Lets make sure the start, limit and page are always integer @rli why?
         if (array_key_exists('query',$requestOptions)) {
@@ -72,35 +73,46 @@ class CallService
         return $response;
     }
 
+    /**
+     * Sets the appropriate authentication information on the request options
+     *
+     * @param Source $source
+     * @param array|null $requestOptions
+     * @return array
+     */
     public function getAuthorization(Source $source, ?array $requestOptions = []): array
     {
         switch ($source->getAuth()) {
+            case 'none':
+                break;
             case 'jwt-HS256':
             case 'jwt-RS512':
             case 'jwt':
-                $requestOptions['headers']['Authorization'] = 'Bearer '.$this->getJwtToken($component);
+                $requestOptions['headers']['Authorization'] = 'Bearer '.$this->getJwtToken($source);
                 break;
+            case 'basic-auth': //backwards compatability
             case 'username-password':
-                $requestOptions['auth'] = [$source->getUsername(), $source->getPassword()];
+                $requestOptions['auth'] = [$source->getAuthConfig()['username'],$source->getAuthConfig()['password']];
                 break;
             case 'vrijbrp-jwt':
-                $requestOptions['headers']['Authorization'] = "Bearer {$this->getTokenFromUrl($component)}";
+                $requestOptions['headers']['Authorization'] = "Bearer {$this->getTokenFromUrl($source)}"; // Watte
                 break;
             case 'hmac':
-                $requestOptions['headers']['Authorization'] = $this->getHmacToken($requestOptions, $component);
+                $requestOptions['headers']['Authorization'] = $this->getHmacToken($requestOptions, $source);
                 break;
-            case 'apikey':
-                if (array_key_exists('authorizationHeader', $component) && array_key_exists('passthroughMethod', $component)) {
-                    switch ($component['passthroughMethod']) {
+            case 'apiKey': //backwards compatability
+            case 'api-key':
+                if (array_key_exists('authorizationHeader', $source) && array_key_exists('passthroughMethod', $source)) {
+                    switch ($source['passthroughMethod']) {
                         case 'query':
-                            $requestOptions['query'][$component['authorizationHeader']] = $component['apikey'];
+                            $requestOptions['query'][$source['authorizationHeader']] = $source['apikey'];
                             break;
                         default:
-                            $requestOptions['headers'][$component['authorizationHeader']] = $component['apikey'];
+                            $requestOptions['headers'][$source['authorizationHeader']] = $source['apikey'];
                             break;
                     }
                 } else {
-                    $requestOptions['headers']['Authorization'] = $component['apikey'];
+                    $requestOptions['headers']['Authorization'] = $source['apikey'];
                 }
                 break;
             default:

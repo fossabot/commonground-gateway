@@ -175,7 +175,7 @@ class Gateway
     private string $location;
 
     /**
-     * @var string The type of this gatewat
+     * @var string The type of this gateway
      *
      * @Assert\NotNull
      * @Assert\Length(
@@ -228,7 +228,7 @@ class Gateway
      *         "openapi_context"={
      *             "type"="string",
      *             "enum"={ "api-key", "bearer-token", "basic-auth","digest-auth","o-auth-1","o-auth-2","hawk-auth","aws-signature","ntlm-auth","akamai-edgegrid","jwt","jwt-HS256","jwt-RS512","jwt-vrij-brp","hmac","2way-ssl","none"},
-     *             "example"="apikey"
+     *             "example"="api-key"
      *         }
      *     }
      * )
@@ -238,8 +238,17 @@ class Gateway
     private string $auth = 'none';
 
     /**
+     * @var array Configuration for the authentication procces
+     *
+     * @Groups({"read","read_secure","write"})
+     * @ORM\Column(type="array")
+     */
+    private array $authConfig = [];
+
+    /**
      * @var string The method used for authentication to the Gateway
      *
+     * @deprecated
      * @Assert\NotNull
      * @Assert\Length(
      *      max = 255
@@ -262,6 +271,7 @@ class Gateway
     /**
      * @var ?string The Locale of the Gateway
      *
+     * @deprecated
      * @Assert\Length(
      *      max = 10
      * )
@@ -281,6 +291,7 @@ class Gateway
     /**
      * @var ?string The accept header used for the Gateway
      *
+     * @deprecated
      * @Assert\Length(
      *      max = 255
      * )
@@ -300,6 +311,7 @@ class Gateway
     /**
      * @var ?string The JWT used for authentication to the Gateway
      *
+     * @deprecated
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -316,6 +328,7 @@ class Gateway
     /**
      * @var ?string The JWT ID used for authentication to the Gateway
      *
+     * @deprecated
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -332,6 +345,7 @@ class Gateway
     /**
      * @var ?string The JWT secret used for authentication to the Gateway
      *
+     * @deprecated
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
