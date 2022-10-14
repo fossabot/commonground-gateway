@@ -222,13 +222,13 @@ class Gateway
      * @Assert\Length(
      *      max = 255
      * )
-     * @Assert\Choice({"api-key", "bearer-token", "basic-auth","digest-auth","o-auth-1","o-auth-2","hawk-auth","aws-signature","ntlm-auth","akamai-edgegrid","jwt","jwt-HS256","jwt-RS512","jwt-vrij-brp","hmac","2way-ssl","none"})
+     * @Assert\Choice({"apikey", "jwt", "username-password", "none", "jwt-HS256"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
      *             "type"="string",
-     *             "enum"={ "api-key", "bearer-token", "basic-auth","digest-auth","o-auth-1","o-auth-2","hawk-auth","aws-signature","ntlm-auth","akamai-edgegrid","jwt","jwt-HS256","jwt-RS512","jwt-vrij-brp","hmac","2way-ssl","none"},
-     *             "example"="api-key"
+     *             "enum"={"apikey", "jwt", "username-password","none", "jwt-HS256"},
+     *             "example"="apikey"
      *         }
      *     }
      * )

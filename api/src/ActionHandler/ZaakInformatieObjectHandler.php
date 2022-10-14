@@ -4,11 +4,9 @@ namespace App\ActionHandler;
 
 use App\Exception\GatewayException;
 use App\Service\ZdsZaakService;
-use Psr\Cache\CacheException;
-use Psr\Cache\InvalidArgumentException;
-use Respect\Validation\Exceptions\ComponentException;
+use Exception;
 
-class IdentificationHandler
+class ZaakInformatieObjectHandler
 {
     private ZdsZaakService $zdsZaakService;
 
@@ -51,14 +49,12 @@ class IdentificationHandler
      * @param array $configuration The configuration of the action
      *
      * @throws GatewayException
-     * @throws CacheException
-     * @throws InvalidArgumentException
-     * @throws ComponentException
+     * @throws Exception
      *
      * @return array
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->zdsZaakService->identificationHandler($data, $configuration);
+        return $this->zdsZaakService->zaakInformatieObjectHandler($data, $configuration);
     }
 }
