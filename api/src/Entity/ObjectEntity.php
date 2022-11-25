@@ -716,7 +716,7 @@ class ObjectEntity
      *
      * @return ObjectEntity
      */
-    public function hydrate(array $array, bool $unsafe = true): ObjectEntity
+    public function hydrate(array $array, bool $unsafe = false): ObjectEntity
     {
         $array = $this->includeEmbeddedArray($array);
         $attributes = [];
