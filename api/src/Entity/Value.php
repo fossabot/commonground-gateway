@@ -13,6 +13,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -479,6 +480,32 @@ class Value
         return $this;
     }
 
+
+    /**
+     * Get a objects based on its id
+     *
+     * @param Uuid $id The id of the object that we are searching for
+     * @param Entity $entity The optional entity to create an object for if none is found
+     *
+     * @return ObjectEntity The object that is part of the objects array
+     */
+    private function getObjectById(Uuid $id, ?Entity $entity): ObjectEntity
+    {
+        // Check if value with this attribute exists for this ObjectEntity
+        $criteria = Criteria::create()->andWhere(Criteria::expr()->eq('id', $id))->setMaxResults(1);
+
+        $objects = $this->getObjects()->matching($criteria);
+
+        if ($objects->isEmpty() && isset($entity)) {
+            // If no value with this attribute was found
+            $object = new ObjectEntity($entity);
+            $object->setId($id);
+            return $object;
+        }
+
+        return $objects->first();
+    }
+
     /**
      * @return Collection|File[]
      */
@@ -538,9 +565,14 @@ class Value
     }
 
     /**
+     * Set a value for this value object
+     *
+     * @param $value
+     * @param bool $unsafe whether to remove values that are not provided (PUT behaviour), defaults to false
+     *
      * @throws Exception
      */
-    public function setValue($value): self
+    public function setValue($value, bool $unsafe = false): self
     {
         if ($this->getAttribute()) {
 
@@ -549,10 +581,6 @@ class Value
             if ($this->getAttribute()->getMultiple() && !in_array($this->getAttribute()->getType(), $doNotGetArrayTypes)) {
                 return $this->setSimpleArrayValue($value);
             } elseif ($this->getAttribute()->getMultiple()) {
-                // Lest deal with multiple file subobjects
-
-                $this->objects->clear();
-
                 if (!$value) {
                     return $this;
                 }
@@ -563,20 +591,38 @@ class Value
 
                     // Catch Array input (for hydrator)
                     if (is_array($value)) {
-                        $valueObject = new ObjectEntity($this->getAttribute()->getObject());
-                        $valueObject->setOwner($this->getObjectEntity()->getOwner());
-                        $valueObject->setApplication($this->getObjectEntity()->getApplication());
-                        $valueObject->setOrganization($this->getObjectEntity()->getOrganization());
-                        $valueObject->hydrate($value);
-                        $value = $valueObject;
+                        // Deal with exisitng objects
+                        if(array_key_exists('id',$value) &&  $object = $this->getObjectById($value['id'])){
+                            $object = $this->getObjectById($value['id'], $this->getAttribute()->getObject());
+                        }
+                        // Deal with non-exisitng objects
+                        else{
+                            $object = new ObjectEntity($this->getAttribute()->getObject());
+                        }
+
+                        $object->setOwner($this->getObjectEntity()->getOwner());
+                        $object->setApplication($this->getObjectEntity()->getApplication());
+                        $object->setOrganization($this->getObjectEntity()->getOrganization());
+                        $object->hydrate($value);
                     }
 
-                    if (is_string($value) || $value == null) {
+                    if (is_string($object) || $object == null) {
                         continue;
                     }
 
-                    $idArray[] = $value->getId();
-                    $this->addObject($value);
+                    $idArray[] = $object->getId();
+                    $this->addObject($object);
+                    $objects[] = $object;
+                }
+
+                if($unsafe){
+                    // Get the attributes that where not touched
+                    $objects = array_diff($this->getObjects(), $objects);
+
+                    // Remove the unwanted object values
+                    foreach($objects as $object){
+                        $this->removeObject($object);
+                    }
                 }
 
                 // Set a string reprecentation of the object

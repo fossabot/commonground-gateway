@@ -686,18 +686,20 @@ class ObjectEntity
     /**
      * Sets a value based on the attribute string name or atribute object.
      *
-     * @param string|Attribute $attribute
+     * @param string|Attribute $attribute the atribute to set the value on
+     * @param $value
+     * @param bool $unsafe whether to remove values that are not provided (PUT behaviour), defaults to false
      *
      * @throws Exception
      *
      * @return false|Value
      */
-    public function setValue($attribute, $value)
+    public function setValue($attribute, $value, bool $unsafe = false)
     {
         $valueObject = $this->getValueObject($attribute);
         // If we find the Value object we set the value
         if ($valueObject instanceof Value) {
-            return $valueObject->setValue($value);
+            return $valueObject->setValue($value, $unsafe);
         }
 
         // If not return false
@@ -708,17 +710,35 @@ class ObjectEntity
      * Populate this object with an array of values, where attributes are diffined by key.
      *
      * @param array $array
+     * @param bool $unsafe whether to remove values that are not provided (PUT behaviour), defaults to false
      *
      * @throws Exception
      *
      * @return ObjectEntity
      */
-    public function hydrate(array $array): ObjectEntity
+    public function hydrate(array $array, bool $unsafe = true): ObjectEntity
     {
         $array = $this->includeEmbeddedArray($array);
+        $attributes = [];
 
         foreach ($array as $key => $value) {
-            $this->setValue($key, $value);
+            $valueObject = $this->setValue($key, $value, $unsafe);
+
+            // Lets create a stack of attributes that were touched
+            if($unsafe){
+                $attributes[] = $valueObject->getAttribute();
+            }
+        }
+
+        // Handle the (optional) removel of unwanted values
+        if($unsafe){
+            // Get the attributes that where not touched
+            $attributes = array_diff($this->getEntity()->getAttributes(), $attributes);
+            // Remove the unwanted object values
+            foreach($attributes as $attribute){
+                $valueObject = $this->getValueObject($attribute);
+                $this->removeObjectValue($valueObject);
+            }
         }
 
         return $this;
